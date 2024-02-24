@@ -18,7 +18,10 @@ export class SlashCommand extends BaseCommand<"SLASH"> {
     if (this._permission) {
       if (!interaction.memberPermissions?.has(this._permission)) return;
     }
-    const reply = await this.callback({ interaction });
+    const reply = await this.callback({
+      interaction,
+      options: interaction.options,
+    });
 
     replyFromCallback(reply, interaction, this);
   }

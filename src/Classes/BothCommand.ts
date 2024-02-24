@@ -27,6 +27,8 @@ export class BothCommand extends BaseCommand<"BOTH"> {
       }
     }
 
+    console.log("execute cb");
+
     const reply = await this.callback({
       message: message as any,
       interaction: interaction as any,

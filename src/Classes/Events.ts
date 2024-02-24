@@ -12,36 +12,43 @@ export class Events {
 
       const command = manager.commands.get(interaction.commandName);
       if (!command) return;
+      console.log("event cb");
       if (command instanceof BothCommand)
-        await manager.publish<"BOTH">(interaction.commandName, {
+        return await manager.publish<"BOTH">(interaction.commandName, {
           interaction,
+          options: interaction.options as any,
         });
       if (command instanceof SlashCommand)
-        await manager.publish<"SLASH">(interaction.commandName, {
+        return await manager.publish<"SLASH">(interaction.commandName, {
           interaction,
+          options: interaction.options as any,
         });
     });
     client.on(DiscordEvents.MessageCreate, async (message) => {
-      const defaultPrefix = "!";
+      let prefix = "!";
       const { content } = message;
+      let guildCache = client.cache.get(message.guild?.id!);
+      if (guildCache && guildCache.prefix) prefix = guildCache.prefix;
       const args = content.split(" ");
-      const prefix = args[0].substring(0, defaultPrefix.length);
+      const messagePrefix = args[0].substring(0, prefix.length);
 
-      if (prefix !== defaultPrefix) return;
+      if (messagePrefix !== prefix) return;
 
-      const commandName = args[0].substring(
-        defaultPrefix.length,
-        args[0].length
-      );
+      const commandName = args[0].substring(prefix.length, args[0].length);
       const command = manager.commands.get(commandName);
 
       if (!command) return;
+      console.log("event cb");
       if (command instanceof BothCommand)
-        await manager.publish<"BOTH">(commandName, {
+        return await manager.publish<"BOTH">(commandName, {
           message,
+          args: message.content.split(" "),
         });
       if (command instanceof MessageCommand)
-        await manager.publish<"MESSAGE">(commandName, { message });
+        return await manager.publish<"MESSAGE">(commandName, {
+          message,
+          args: message.content.split(" "),
+        });
 
       return;
     });

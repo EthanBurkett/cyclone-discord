@@ -6,6 +6,7 @@ import chalk from "chalk";
 import moment from "moment";
 import fs from "fs";
 import path from "path";
+import Cache from "./Classes/Cache";
 
 declare module "discord.js" {
   interface Client {
@@ -51,8 +52,12 @@ client.error = (...args: any[]) => {
 };
 
 client.on(DiscordEvents.ClientReady, () => {
+  client.cache = new Cache();
+
   commandManager = new CommandManager();
   new Events(client);
+
+  client.log("Bot is ready");
 });
 
 // @ts-ignore
@@ -60,7 +65,7 @@ client
   .login(process.env.DISCORD_TOKEN)
   .then(async (t) => {
     await mongoose
-      .connect("mongodb://admin:57BoxRed@10.0.0.239:27017/cyclone")
+      .connect("mongodb://admin:57BoxRed@192.168.1.91:27017/cyclone")
       .then(() => {
         client.log("Connected to MongoDB");
       })

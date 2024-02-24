@@ -1,14 +1,11 @@
 import type { ValidCommand } from "@types";
 import {
-  type MessagePayloadOption,
   EmbedBuilder,
   MessagePayload,
   ChatInputCommandInteraction,
   type CacheType,
   Message,
 } from "discord.js";
-
-import { client } from "@/index";
 
 export const replyFromCallback = async (
   reply: string | void | MessagePayload | EmbedBuilder,

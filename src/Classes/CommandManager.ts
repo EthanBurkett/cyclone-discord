@@ -40,10 +40,13 @@ export class CommandManager {
   ) {
     const command = this._commands.get(commandName);
     if (!command) return;
+    console.log("publish cb");
     if (command instanceof BothCommand)
-      await command.execute(message, interaction);
-    if (command instanceof MessageCommand) await command.execute(message);
-    if (command instanceof SlashCommand) await command.execute(interaction);
+      return await command.execute(message, interaction);
+    if (command instanceof MessageCommand)
+      return await command.execute(message);
+    if (command instanceof SlashCommand)
+      return await command.execute(interaction);
   }
 
   private async _findCommands(extend?: string) {
@@ -81,7 +84,9 @@ export class CommandManager {
   }
 
   private async _slashCommandChecks(cmds: Collection<string, ValidCommand>) {
-    const commands = cmds.filter((c) => c instanceof SlashCommand);
+    const commands = cmds.filter(
+      (c) => c instanceof SlashCommand || c instanceof BothCommand
+    );
 
     const clientCommands = await client.application?.commands
       .fetch()
@@ -135,16 +140,16 @@ export class CommandManager {
     const guildCommands = this._commands.filter(
       (c) => c instanceof SlashCommand || c instanceof BothCommand
     );
+
     for (const [name, command] of guildCommands) {
+      if (!guildCommands) {
+        await this._create(command);
+        continue;
+      }
       if (!command.guilds) continue;
       for (const guildId of command.guilds) {
         const guild = await client.guilds.cache.get(guildId);
         const fetchedCommands = await guild?.commands.fetch().then((c) => c);
-
-        if (!guildCommands) {
-          await this._create(command);
-          continue;
-        }
 
         // find commands that are in the client but not in the command manager
         const commandsToDelete = fetchedCommands?.filter(

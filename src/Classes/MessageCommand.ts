@@ -17,7 +17,10 @@ export class MessageCommand extends BaseCommand<"MESSAGE"> {
       if (!message.member?.permissions.has(this._permission)) return;
     }
 
-    const reply = await this.callback({ message });
+    const reply = await this.callback({
+      message,
+      args: message.content.split(" "),
+    });
 
     replyFromCallback(reply, message, this);
   }

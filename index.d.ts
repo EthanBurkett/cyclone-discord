@@ -5,9 +5,11 @@ import type {
   ApplicationCommandOptionData,
   CacheType,
   CommandInteraction,
+  CommandInteractionOptionResolver,
   Message,
   MessagePayloadOption,
   PermissionsString,
+  Cached,
 } from "discord.js";
 
 export type CommandType = "SLASH" | "MESSAGE" | "BOTH";
@@ -34,13 +36,23 @@ export type CallbackContext<TCommandType extends CommandType = "BOTH"> =
     ? {
         message?: Message<boolean>;
         interaction?: CommandInteraction<CacheType>;
+        args?: string[];
+        options?: Omit<
+          CommandInteractionOptionResolver<CacheType>,
+          "getMessage" | "getFocused"
+        >;
       }
     : TCommandType extends "SLASH"
     ? {
         interaction: CommandInteraction<CacheType>;
+        options: Omit<
+          CommandInteractionOptionResolver<CacheType>,
+          "getMessage" | "getFocused"
+        >;
       }
     : {
         message: Message<boolean>;
+        args: string[];
       };
 
 export type CommandCallback<TCommandType extends CommandType> = (
